@@ -1,9 +1,9 @@
 // Funcionalidades JavaScript para TeenSmartInsight
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-cerrar alertas después de 5 segundos
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(function(alert) {
+    // Solo auto-cerrar alertas de notificación, no las alertas de resultados
+    const notificationAlerts = document.querySelectorAll('.alert.alert-dismissible');
+    notificationAlerts.forEach(function(alert) {
         setTimeout(function() {
             const bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();

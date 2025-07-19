@@ -150,15 +150,15 @@
                 <div class="card-body">
                     <h3 class="h5 mb-2">Nivel de Adicción Tecnológica:</h3>
                     {% if "Alto riesgo" in prediction %}
-                        <div class="alert alert-danger py-2 mb-3">
+                        <div class="alert alert-danger py-2 mb-3 prediction-result">
                             <strong>{{ prediction }}</strong>
                         </div>
                     {% elif "moderado" in prediction.lower() %}
-                        <div class="alert alert-warning py-2 mb-3">
+                        <div class="alert alert-warning py-2 mb-3 prediction-result">
                             <strong>{{ prediction }}</strong>
                         </div>
                     {% else %}
-                        <div class="alert alert-success py-2 mb-3">
+                        <div class="alert alert-success py-2 mb-3 prediction-result">
                             <strong>{{ prediction }}</strong>
                         </div>
                     {% endif %}

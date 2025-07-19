@@ -42,9 +42,8 @@ def index():
             # Si hay un error con Gemini, usar el servicio alternativo
             if analysis and analysis.startswith("Error al conectar con Gemini"):
                 analysis = mock_service.analyze_prediction(user_data, prediction)
-                flash('Análisis completado usando el servicio local', 'warning')
-            else:
-                flash('Análisis completado con éxito', 'success')
+            
+            flash('Análisis completado con éxito', 'success')
         else:
             flash('Error al realizar la predicción', 'danger')
     

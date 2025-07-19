@@ -1,3 +1,139 @@
+<details>
+<summary><h2>English</h2></summary>
+
+# TeenSmartInsight
+
+Web application for analyzing adolescents’ technology usage habits and assessing potential levels of technology addiction.
+
+## Features
+
+* Form to collect data on technology usage habits
+* Machine learning model to predict technology addiction levels
+* Integration with Gemini for detailed analysis and personalized recommendations
+* Storage of predictions in CSV format for further analysis
+
+## Requirements
+
+* Python 3.8 or higher
+* Pip (Python package manager)
+* Google Gemini API Key
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/Dylalva/TeenSmartInsight.git
+   cd TeenSmartInsight/App
+   ```
+
+2. Create a virtual environment:
+
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+
+   * On Windows:
+
+     ```bash
+     venv\Scripts\activate
+     ```
+   * On macOS/Linux:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. Configure environment variables:
+
+   * Copy `.env.example` to `.env`
+   * Edit `.env` and add your Google Gemini API Key
+
+## Usage
+
+### Running Locally
+
+1. Start the application:
+
+   ```bash
+   python run.py
+   ```
+2. Open your web browser and go to:
+
+   ```
+   http://localhost:5000
+   ```
+
+### Running with Docker
+
+1. Build and run with Docker Compose:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+   Or use this command to build and run the container directly:
+
+   ```bash
+   docker run -d --name teensmart -p 5000:5000 dylalva/app-teensmart
+   ```
+
+2. Open your web browser and go to:
+
+   ```
+   http://localhost:5000
+   ```
+
+3. To stop the application:
+
+   ```bash
+   docker-compose down
+   ```
+
+### Using the Application
+
+Fill out the form with the requested data and click **Analyze** to get your results.
+
+## Project Structure
+
+```
+TeenSmartInsight/App/
+├── app/                    # Main application directory
+│   ├── controllers/        # Route handlers
+│   ├── models/             # Business logic models
+│   ├── services/           # External integration services
+│   ├── static/             # Static files (CSS, JS, images)
+│   ├── templates/          # HTML templates
+│   └── utils/              # Utilities and helper modules
+├── data/                   # Directory for storing data
+├── model/                  # Directory containing the trained model
+├── .dockerignore           # Files to ignore in Docker context
+├── .env                    # Environment variables
+├── .env.example            # Example environment variables
+├── docker-compose.yml      # Docker Compose configuration
+├── Dockerfile              # Docker image build instructions
+├── requirements.txt        # Project dependencies
+└── run.py                  # Application entry point
+```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+</details>
+
+
+<details>
+<summary><h2>Español</h2></summary>
+
 # TeenSmartInsight
 
 Aplicación web para analizar hábitos de uso de tecnología en adolescentes y evaluar posibles niveles de adicción tecnológica.
@@ -19,7 +155,7 @@ Aplicación web para analizar hábitos de uso de tecnología en adolescentes y e
 
 1. Clonar el repositorio:
 ```
-git clone <url-del-repositorio>
+git clone https://github.com/Dylalva/TeenSmartInsight.git
 cd TeenSmartInsight/App
 ```
 
@@ -67,6 +203,11 @@ http://localhost:5000
 ```
 docker-compose up -d
 ```
+O bien puedes utilizar el siguiente comando que construye la aplicación:
+
+```Bash
+docker run -d --name teensmart -p 5000:5000 dylalva/app-teensmart
+```
 
 2. Abrir un navegador web y acceder a:
 ```
@@ -107,3 +248,5 @@ TeenSmartInsight/App/
 ## Licencia
 
 Este proyecto está licenciado bajo la [Licencia MIT](LICENSE)
+
+</details>

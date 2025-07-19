@@ -46,6 +46,24 @@ body {
     line-height: 1.4;
 }
 
+/* Estilos para las alertas de resultados */
+.prediction-result {
+    border-left: 4px solid;
+    font-weight: 500;
+}
+
+.alert-danger.prediction-result {
+    border-left-color: #dc3545;
+}
+
+.alert-warning.prediction-result {
+    border-left-color: #ffc107;
+}
+
+.alert-success.prediction-result {
+    border-left-color: #198754;
+}
+
 /* Estilos para el contenido Markdown */
 .analysis-content h1 {
     font-size: 1.6rem;
