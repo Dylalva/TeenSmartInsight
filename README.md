@@ -1,168 +1,182 @@
+# TeenSmartInsight
+
 <details>
-  <summary><h1>Español</h1></summary>
-# Human Personality Classification
+<summary><h2>English</h2></summary>
 
-This project analyzes and models personality types (Extrovert vs. Introvert) based on behavioral and social features. It includes data preprocessing, feature engineering, model training, evaluation, and visualization pipelines organized for scalability and reproducibility.
+# TeenSmartInsight
 
-## Dataset Overview
+A comprehensive project for analyzing adolescents' technology usage habits and assessing potential levels of technology addiction using machine learning and AI.
 
-* **Rows**: \~2,900
-* **Columns**:
+## Project Overview
 
-  * `Time_spent_Alone`: Hours spent alone daily (0–11)
-  * `Stage_fear`: Presence of stage fright (`Yes`/`No`)
-  * `Social_event_attendance`: Frequency of social events (0–10)
-  * `Going_outside`: Frequency of going outside (0–7)
-  * `Drained_after_socializing`: Feeling drained after socializing (`Yes`/`No`)
-  * `Friends_circle_size`: Number of close friends (0–15)
-  * `Post_frequency`: Social media post frequency (0–10)
-  * `Personality`: Target label (`Extrovert`/`Introvert`)
-
----
-
-## Prerequisites
-
-* Python 3.9+
-* `pip install -r requirements.txt` (see [requirements.txt](requirements.txt))
-* Docker (optional)
-
----
+TeenSmartInsight is a data science and web application project that combines exploratory data analysis, machine learning modeling, and a user-friendly web interface to help identify and address technology addiction in adolescents.
 
 ## Project Structure
 
+The project is organized into several key components:
+
 ```
-Human-Personality/
-├── Dockerfile
-├── README.md
-├── requirements.txt
-├── src/human_personality/
-│   ├── data/make_dataset.py
-│   ├── features/build_features.py
-│   ├── models/train_model.py
-│   ├── models/evaluate_model.py
-├── scripts/               # Quick pipeline executables
-│   ├── run_data_prep.sh
-│   ├── run_features.sh
-│   └── run_train.sh
-├── figures/               # Generated plots and charts
+TeenSmartInsight/
+├── App/                    # Web application
+├── data/                   # Data directory
+│   └── raw/                # Raw dataset files
+├── figures/                # Visualization outputs
+├── models/                 # Trained models
+├── notebooks/              # Jupyter notebooks for analysis
+├── scripts/                # Utility scripts
+└── src/                    # Source code for model training
+    └── TeenSmartInsight/   # Core package
+        └── models/         # Model training and evaluation
 ```
 
----
+### Key Components
 
-## Quick Start
+#### 1. Data Analysis and Model Development
 
-1. **Prepare data**:
+- **Notebooks**: Contains Jupyter notebooks for exploratory data analysis, feature engineering, and model development
+  - `001_TeenAddiction.ipynb`: Main analysis notebook that explores the dataset, visualizes relationships, and develops the prediction model
 
-   ```bash
-   bash scripts/run_data_prep.sh
-   bash scripts/run_features.sh
-   ```
-2. **Train model**:
+- **Source Code**: Modular Python code for model training and evaluation
+  - `train_model.py`: Script for training the Random Forest regression model
+  - `evaluate_model.py`: Script for evaluating model performance
 
-   ```bash
-   bash scripts/run_train.sh
-   ```
-3. **Evaluate**:
+#### 2. Web Application (App/)
 
-   ```python
-   bash scripts/run_test.sh
-   ```
-4. **Visualize**: Check `figures/` for histograms, pairplots, correlation heatmaps, ROC curves, learning curves, confusion matrices, and feature importances.
+- **Flask Application**: Web interface for users to input their technology usage data
+  - Collects data through a user-friendly form
+  - Processes data using the trained machine learning model
+  - Integrates with Google Gemini API for detailed analysis and personalized recommendations
+  - Stores predictions for further analysis
 
----
+- **Docker Support**: Containerization for easy deployment
+  - `Dockerfile` and `docker-compose.yml` for containerized deployment
 
-## Results Highlights
+## Functionality
 
-* **Model Comparison**: Random Forest achieved the highest weighted F1 score (\~0.95).
-* **Learning Curve**: Balanced training and validation F1 scores, no significant overfitting.
-* **ROC Curve**: AUC ≈ 0.95 indicates strong discriminative performance.
-* **Confusion Matrix**: Low false positives/negatives (17 introverts misclassified, 32 extroverts misclassified).
-* **Feature Importances**: Top features include `Social_Stress`, `Social_Behavior`, and `Interaction_Time`.
+### 1. Data Analysis
+
+The project begins with exploratory data analysis of adolescent technology usage patterns, examining:
+- Daily usage hours
+- Social media and gaming time
+- Sleep patterns
+- Academic performance
+- Phone checking frequency
+- Weekend usage patterns
+
+### 2. Machine Learning Model
+
+- Uses a **Random Forest Regressor** to predict technology addiction levels
+- Features engineered from usage patterns and behavioral indicators
+- Model evaluation using MSE, MAE, and R² metrics
+
+### 3. Web Application
+
+- **Input Form**: Collects user data on technology usage habits
+- **Prediction Engine**: Processes data through the trained model
+- **AI Analysis**: Integrates with Google Gemini for personalized recommendations
+- **Data Storage**: Saves predictions for future analysis and model improvement
+
+## Technologies Used
+
+- **Data Analysis**: Pandas, NumPy, Matplotlib, Seaborn
+- **Machine Learning**: Scikit-learn, Joblib
+- **Web Development**: Flask, Bootstrap
+- **AI Integration**: Google Gemini API
+- **Deployment**: Docker, Docker Compose
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 
 </details>
----
+
 
 <details>
-  <summary><h1>Español</h1></summary>
+<summary><h2>Español</h2></summary>
 
-# Clasificación de Personalidad Humana
+# TeenSmartInsight
 
-Este proyecto analiza y modela tipos de personalidad (Extrovertido vs. Introvertido) basándose en características de comportamiento y sociales. Incluye pipelines de preprocesamiento de datos, ingeniería de características, entrenamiento y evaluación de modelos, así como visualizaciones.
+Un proyecto integral para analizar los hábitos de uso de tecnología en adolescentes y evaluar posibles niveles de adicción tecnológica utilizando machine learning e IA.
 
-## Descripción del Conjunto de Datos
+## Visión General del Proyecto
 
-* **Filas**: \~2,900
-* **Columnas**:
-
-  * `Time_spent_Alone`: Horas diarias en soledad (0–11)
-  * `Stage_fear`: Presencia de miedo escénico (`Yes`/`No`)
-  * `Social_event_attendance`: Frecuencia de eventos sociales (0–10)
-  * `Going_outside`: Frecuencia de salir al exterior (0–7)
-  * `Drained_after_socializing`: Sensación de agotamiento tras socializar (`Yes`/`No`)
-  * `Friends_circle_size`: Número de amigos cercanos (0–15)
-  * `Post_frequency`: Frecuencia de publicaciones en redes (0–10)
-  * `Personality`: Etiqueta objetivo (`Extrovert`/`Introvert`)
-
----
-
-## Requisitos Previos
-
-* Python 3.9+
-* `pip install -r requirements.txt`
-* Docker (opcional)
-
----
+TeenSmartInsight es un proyecto de ciencia de datos y aplicación web que combina análisis exploratorio de datos, modelado de machine learning y una interfaz web fácil de usar para ayudar a identificar y abordar la adicción tecnológica en adolescentes.
 
 ## Estructura del Proyecto
 
+El proyecto está organizado en varios componentes clave:
+
 ```
-Human-Personality/
-├── Dockerfile
-├── README.md
-├── requirements.txt
-├── src/human_personality/
-│   ├── data/make_dataset.py
-│   ├── features/build_features.py
-│   ├── models/train_model.py
-│   ├── models/evaluate_model.py
-│   └── utils.py
-├── scripts/               # Ejecución rápida de pipelines
-│   ├── run_data_prep.sh
-│   ├── run_features.sh
-│   └── run_train.sh
-├── figures/               # Gráficos y visualizaciones generados
+TeenSmartInsight/
+├── App/                    # Aplicación web
+├── data/                   # Directorio de datos
+│   └── raw/                # Archivos de datos sin procesar
+├── figures/                # Salidas de visualización
+├── models/                 # Modelos entrenados
+├── notebooks/              # Notebooks Jupyter para análisis
+├── scripts/                # Scripts de utilidad
+└── src/                    # Código fuente para entrenamiento de modelos
+    └── TeenSmartInsight/   # Paquete principal
+        └── models/         # Entrenamiento y evaluación de modelos
 ```
 
----
+### Componentes Principales
 
-## Inicio Rápido
+#### 1. Análisis de Datos y Desarrollo del Modelo
 
-1. **Preparar datos**:
+- **Notebooks**: Contiene notebooks Jupyter para análisis exploratorio de datos, ingeniería de características y desarrollo del modelo
+  - `001_TeenAddiction.ipynb`: Notebook principal de análisis que explora el conjunto de datos, visualiza relaciones y desarrolla el modelo de predicción
 
-   ```bash
-   bash scripts/run_data_prep.sh
-   bash scripts/run_features.sh
-   ```
-2. **Entrenar modelo**:
+- **Código Fuente**: Código Python modular para entrenamiento y evaluación de modelos
+  - `train_model.py`: Script para entrenar el modelo de regresión Random Forest
+  - `evaluate_model.py`: Script para evaluar el rendimiento del modelo
 
-   ```bash
-   bash scripts/run_train.sh
-   ```
-3. **Evaluar**:
+#### 2. Aplicación Web (App/)
 
-   ```python
-   bash scripts/run_test.sh
-   ```
-4. **Visualizar**: Revisa `figures/` para histogramas, pairplots, mapas de calor, curvas ROC, curvas de aprendizaje, matrices de confusión e importancias de variables.
+- **Aplicación Flask**: Interfaz web para que los usuarios ingresen sus datos de uso de tecnología
+  - Recopila datos a través de un formulario fácil de usar
+  - Procesa datos utilizando el modelo de machine learning entrenado
+  - Se integra con la API de Google Gemini para análisis detallados y recomendaciones personalizadas
+  - Almacena predicciones para análisis posterior
 
----
+- **Soporte Docker**: Containerización para facilitar el despliegue
+  - `Dockerfile` y `docker-compose.yml` para despliegue containerizado
 
-## Resultados Destacados
+## Funcionalidad
 
-* **Comparación de Modelos**: Random Forest obtuvo el mejor F1 ponderado (\~0.95).
-* **Curva de Aprendizaje**: F1 equilibrado entre entrenamiento y validación, sin sobreajuste.
-* **Curva ROC**: AUC ≈ 0.95 indica excelente capacidad discriminativa.
-* **Matriz de Confusión**: Bajos falsos positivos/negativos (17 introvertidos mal clasificados, 32 extrovertidos mal clasificados).
-* **Importancia de Variables**: Las top incluyen `Social_Stress`, `Social_Behavior` e `Interaction_Time`.
+### 1. Análisis de Datos
+
+El proyecto comienza con un análisis exploratorio de datos de patrones de uso de tecnología en adolescentes, examinando:
+- Horas de uso diario
+- Tiempo en redes sociales y juegos
+- Patrones de sueño
+- Rendimiento académico
+- Frecuencia de revisión del teléfono
+- Patrones de uso en fin de semana
+
+### 2. Modelo de Machine Learning
+
+- Utiliza un **Random Forest Regressor** para predecir niveles de adicción tecnológica
+- Características diseñadas a partir de patrones de uso e indicadores de comportamiento
+- Evaluación del modelo utilizando métricas MSE, MAE y R²
+
+### 3. Aplicación Web
+
+- **Formulario de Entrada**: Recopila datos del usuario sobre hábitos de uso de tecnología
+- **Motor de Predicción**: Procesa datos a través del modelo entrenado
+- **Análisis de IA**: Se integra con Google Gemini para recomendaciones personalizadas
+- **Almacenamiento de Datos**: Guarda predicciones para análisis futuro y mejora del modelo
+
+## Tecnologías Utilizadas
+
+- **Análisis de Datos**: Pandas, NumPy, Matplotlib, Seaborn
+- **Machine Learning**: Scikit-learn, Joblib
+- **Desarrollo Web**: Flask, Bootstrap
+- **Integración de IA**: API de Google Gemini
+- **Despliegue**: Docker, Docker Compose
+
+## Licencia
+
+Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
 
 </details>

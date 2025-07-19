@@ -126,7 +126,7 @@ TeenSmartInsight/App/
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](../LICENSE).
 
 </details>
 
@@ -247,6 +247,6 @@ TeenSmartInsight/App/
 
 ## Licencia
 
-Este proyecto está licenciado bajo la [Licencia MIT](LICENSE)
+Este proyecto está licenciado bajo la [Licencia MIT](../LICENSE)
 
 </details>
