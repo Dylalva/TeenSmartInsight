@@ -1,1 +1,0 @@
-python -m src.TeenSmartInsight.models.evaluate_model
