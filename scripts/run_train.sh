@@ -1,0 +1,1 @@
+python -m src.TeenSmartInsight.models.train_model

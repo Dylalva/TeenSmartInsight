@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}TeenSmartInsight - Análisis de Adicción Tecnológica{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h5 mb-0">Formulario de Análisis</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('main.index') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Daily_Usage_Hours.label(class="form-label") }}
+                                {{ form.Daily_Usage_Hours(class="form-control") }}
+                                {% if form.Daily_Usage_Hours.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Daily_Usage_Hours.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Apps_Used_Daily.label(class="form-label") }}
+                                {{ form.Apps_Used_Daily(class="form-control") }}
+                                {% if form.Apps_Used_Daily.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Apps_Used_Daily.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Time_on_Social_Media.label(class="form-label") }}
+                                {{ form.Time_on_Social_Media(class="form-control") }}
+                                {% if form.Time_on_Social_Media.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Time_on_Social_Media.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Time_on_Gaming.label(class="form-label") }}
+                                {{ form.Time_on_Gaming(class="form-control") }}
+                                {% if form.Time_on_Gaming.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Time_on_Gaming.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Phone_Checks_Per_Day.label(class="form-label") }}
+                                {{ form.Phone_Checks_Per_Day(class="form-control") }}
+                                {% if form.Phone_Checks_Per_Day.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Phone_Checks_Per_Day.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Sleep_Hours.label(class="form-label") }}
+                                {{ form.Sleep_Hours(class="form-control") }}
+                                {% if form.Sleep_Hours.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Sleep_Hours.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Weekend_Usage_Hours.label(class="form-label") }}
+                                {{ form.Weekend_Usage_Hours(class="form-control") }}
+                                {% if form.Weekend_Usage_Hours.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Weekend_Usage_Hours.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                {{ form.Academic_Performance.label(class="form-label") }}
+                                {{ form.Academic_Performance(class="form-control") }}
+                                {% if form.Academic_Performance.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.Academic_Performance.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        {{ form.submit(class="btn btn-primary w-100") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        {% if prediction is not none %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h2 class="card-title h5 mb-0">Resultado del Análisis</h2>
+                </div>
+                <div class="card-body">
+                    <h3 class="h5 mb-2">Nivel de Adicción Tecnológica:</h3>
+                    {% if "Alto riesgo" in prediction %}
+                        <div class="alert alert-danger py-2 mb-3">
+                            <strong>{{ prediction }}</strong>
+                        </div>
+                    {% elif "moderado" in prediction.lower() %}
+                        <div class="alert alert-warning py-2 mb-3">
+                            <strong>{{ prediction }}</strong>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success py-2 mb-3">
+                            <strong>{{ prediction }}</strong>
+                        </div>
+                    {% endif %}
+                    
+                    {% if analysis %}
+                        <h3 class="h5 mt-3 mb-2">Análisis de Gemini:</h3>
+                        <div class="analysis-content">
+                            {{ analysis|safe }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h2 class="card-title h5 mb-0">Información</h2>
+                </div>
+                <div class="card-body">
+                    <p>Complete el formulario para obtener un análisis de los hábitos tecnológicos y recibir recomendaciones personalizadas.</p>
+                    <p>Esta herramienta utiliza un modelo de aprendizaje automático para evaluar el nivel de adicción tecnológica basado en los datos proporcionados.</p>
+                    <p>Además, se utiliza la IA generativa de Gemini para proporcionar un análisis detallado y recomendaciones personalizadas.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

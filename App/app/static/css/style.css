@@ -1,0 +1,129 @@
+/* Estilos personalizados para TeenSmartInsight */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.footer {
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.analysis-content {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px 15px;
+    line-height: 1.4;
+}
+
+/* Estilos para el contenido Markdown */
+.analysis-content h1 {
+    font-size: 1.6rem;
+    margin-top: 0.7rem;
+    margin-bottom: 0.3rem;
+    color: #0d6efd;
+}
+
+.analysis-content h2 {
+    font-size: 1.3rem;
+    margin-top: 0.6rem;
+    margin-bottom: 0.3rem;
+    color: #0d6efd;
+}
+
+.analysis-content h3 {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.2rem;
+    color: #0d6efd;
+}
+
+.analysis-content ul, .analysis-content ol {
+    padding-left: 1.5rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.analysis-content li {
+    margin-bottom: 0.2rem;
+}
+
+.analysis-content p {
+    margin-top: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.analysis-content code {
+    background-color: #e9ecef;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.analysis-content pre {
+    background-color: #212529;
+    color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+
+.analysis-content blockquote {
+    border-left: 4px solid #0d6efd;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #6c757d;
+}
+
+.analysis-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.analysis-content th, .analysis-content td {
+    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+}
+
+.analysis-content th {
+    background-color: #e9ecef;
+}
+
+/* Estilos para dispositivos móviles */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

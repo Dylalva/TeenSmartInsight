@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Acerca de TeenSmartInsight{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h1 class="card-title h4 mb-0">Acerca de TeenSmartInsight</h1>
+    </div>
+    <div class="card-body">
+        <h2 class="h5">¿Qué es TeenSmartInsight?</h2>
+        <p>TeenSmartInsight es una aplicación diseñada para analizar los hábitos de uso de tecnología en adolescentes y evaluar posibles niveles de adicción tecnológica. La aplicación utiliza un modelo de aprendizaje automático entrenado con datos reales para proporcionar evaluaciones precisas.</p>
+        
+        <h2 class="h5 mt-4">¿Cómo funciona?</h2>
+        <p>El usuario proporciona información sobre sus hábitos de uso de tecnología a través de un formulario. Estos datos son procesados por un modelo de machine learning que predice el nivel de adicción tecnológica. Además, la aplicación utiliza la IA generativa de Gemini para proporcionar un análisis detallado y recomendaciones personalizadas.</p>
+        
+        <h2 class="h5 mt-4">Variables analizadas</h2>
+        <ul>
+            <li><strong>Horas de uso diario:</strong> Tiempo total dedicado a dispositivos electrónicos en un día típico.</li>
+            <li><strong>Aplicaciones usadas diariamente:</strong> Número de aplicaciones diferentes utilizadas regularmente.</li>
+            <li><strong>Tiempo en redes sociales:</strong> Horas diarias dedicadas a plataformas de redes sociales.</li>
+            <li><strong>Tiempo en juegos:</strong> Horas diarias dedicadas a videojuegos.</li>
+            <li><strong>Veces que revisa el teléfono:</strong> Frecuencia con la que se consulta el dispositivo móvil.</li>
+            <li><strong>Horas de sueño:</strong> Promedio de horas de descanso nocturno.</li>
+            <li><strong>Horas de uso en fin de semana:</strong> Tiempo dedicado a dispositivos durante los fines de semana.</li>
+            <li><strong>Rendimiento académico:</strong> Autoevaluación del desempeño escolar en una escala de 1 a 10.</li>
+        </ul>
+        
+        <h2 class="h5 mt-4">Privacidad</h2>
+        <p>Los datos proporcionados se utilizan exclusivamente para generar el análisis y se almacenan de forma anónima con fines de investigación y mejora del modelo. No se comparten con terceros ni se utilizan para fines comerciales.</p>
+    </div>
+</div>
+{% endblock %}
