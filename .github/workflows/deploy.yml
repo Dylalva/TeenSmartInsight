@@ -11,6 +11,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: "us-east-2"
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -33,10 +34,12 @@ jobs:
       - name: Configure SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_flaskapp
+          chmod 600 ~/.ssh/id_rsa_flaskapp
           echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa_flaskapp.pub
           chmod 644 ~/.ssh/id_rsa.pub
+          chmod 644 ~/.ssh/id_rsa_flaskapp.pub
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
       - name: Terraform Init
@@ -54,7 +57,7 @@ jobs:
         run: |
           cd infrastructure
           terraform apply -auto-approve
-          echo "instance_ip=$(terraform output -raw instance_ip)" >> $GITHUB_OUTPUT
+          echo "instance_ip=$(terraform output -raw public_ip)" >> $GITHUB_OUTPUT
 
       - name: Update hosts.ini with new IP
         run: |
