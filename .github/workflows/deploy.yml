@@ -57,21 +57,27 @@ jobs:
         run: |
           cd infrastructure
           terraform apply -auto-approve
-          PUBLIC_IP=$(terraform output -raw public_ip)
-          echo "instance_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
+          
+      - name: Get Terraform Output
+        id: terraform_output
+        run: |
+          cd infrastructure
+          IP=$(terraform output -raw public_ip)
+          echo "instance_ip=$IP" >> $GITHUB_ENV
+          echo "IP capturada: $IP"
 
       - name: Update hosts.ini with new IP
         run: |
           cd infrastructure
           echo "[app_servers]" > hosts.ini
-          echo "${{ steps.terraform.outputs.instance_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
+          echo "${{ env.instance_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
 
       - name: Wait for SSH to be available
         run: |
           # Esperar a que la instancia esté lista para conexiones SSH
           echo "Esperando a que la instancia esté lista para SSH..."
           for i in {1..30}; do
-            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@${{ steps.terraform.outputs.instance_ip }} 'echo SSH ready'; then
+            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@${{ env.instance_ip }} 'echo SSH ready'; then
               echo "SSH está listo!"
               break
             fi
