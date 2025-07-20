@@ -180,3 +180,5 @@ El proyecto comienza con un análisis exploratorio de datos de patrones de uso d
 Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
 
 </details>
+
+[Demo](figures/app_demo.mp4)

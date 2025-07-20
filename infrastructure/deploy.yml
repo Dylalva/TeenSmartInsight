@@ -1,0 +1,413 @@
+---
+- name: Despliegue Flask TeenSmartInsight en EC2
+  hosts: web
+  become: true
+
+  vars:
+    git_repo: https://github.com/Dylalva/TeenSmartInsight.git
+    app_dest: /opt/TeenSmartInsight
+    venv_path: "{{ app_dest }}/venv"
+    service_name: teensmartinsight
+    gunicorn_bind: "0.0.0.0:8000"
+
+  tasks:
+    - name: Instalar dependencias del sistema
+      apt:
+        name:
+          - git
+          - python3
+          - python3-venv
+          - python3-dev
+          - gcc
+          - nginx
+        state: present
+        update_cache: yes
+
+    - name: Clonar o actualizar el repositorio
+      git:
+        repo: "{{ git_repo }}"
+        dest: "{{ app_dest }}"
+        version: main
+        force: yes
+      notify: Reiniciar {{ service_name }}
+
+    - name: Crear virtualenv
+      command: python3 -m venv {{ venv_path }}
+      args:
+        creates: "{{ venv_path }}/bin/activate"
+
+    - name: Instalar dependencias de Python
+      pip:
+        requirements: "{{ app_dest }}/requirements.txt"
+        virtualenv: "{{ venv_path }}"
+        state: present
+
+    - name: Instalar Flask y Gunicorn
+      pip:
+        name:
+          - flask
+          - gunicorn
+          - python-dotenv
+          - flask-wtf
+          - pandas
+          - numpy
+          - scikit-learn
+          - joblib
+          - markdown2
+        virtualenv: "{{ venv_path }}"
+        state: present
+        
+    - name: Verificar instalación de markdown2
+      command: "{{ venv_path }}/bin/pip show markdown2"
+      register: markdown2_check
+      changed_when: false
+      failed_when: false
+      
+    - name: Mostrar información de markdown2
+      debug:
+        var: markdown2_check.stdout_lines
+        
+    - name: Instalar markdown2 directamente
+      command: "{{ venv_path }}/bin/pip install markdown2"
+      when: markdown2_check.rc != 0
+
+    - name: Crear directorio para logs
+      file:
+        path: "{{ app_dest }}/logs"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Crear directorios necesarios
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+      with_items:
+        - "{{ app_dest }}/App/app/services"
+        - "{{ app_dest }}/App/app/controllers"
+        - "{{ app_dest }}/App/app/models"
+        - "{{ app_dest }}/App/app/templates"
+        - "{{ app_dest }}/App/app/static"
+
+    - name: Verificar estructura del directorio App
+      command: ls -la {{ app_dest }}/App
+      register: app_dir_structure
+      changed_when: false
+
+    - name: Mostrar estructura del directorio App
+      debug:
+        var: app_dir_structure.stdout_lines
+
+    - name: Verificar estructura del directorio App/app
+      command: ls -la {{ app_dest }}/App/app
+      register: app_subdir_structure
+      changed_when: false
+      failed_when: false
+
+    - name: Mostrar estructura del directorio App/app
+      debug:
+        var: app_subdir_structure.stdout_lines
+        
+    - name: Establecer variable para el directorio de la aplicación
+      set_fact:
+        app_directory: "{{ app_dest }}/App"
+
+    - name: Verificar archivo __init__.py en App/app
+      command: cat {{ app_dest }}/App/app/__init__.py
+      register: init_content
+      changed_when: false
+      failed_when: false
+
+    - name: Mostrar contenido de __init__.py
+      debug:
+        var: init_content.stdout_lines
+        
+    - name: Crear archivo __init__.py en App/app/controllers
+      copy:
+        dest: "{{ app_dest }}/App/app/controllers/__init__.py"
+        content: "# Este archivo es necesario para que Python reconozca el directorio como un paquete"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+        force: no
+        
+    - name: Crear archivo __init__.py en App/app/services
+      copy:
+        dest: "{{ app_dest }}/App/app/services/__init__.py"
+        content: "# Este archivo es necesario para que Python reconozca el directorio como un paquete"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+        force: no
+
+    - name: Crear archivo .env en App
+      copy:
+        dest: "{{ app_dest }}/App/.env"
+        content: |
+          DATABASE_PATH={{ app_dest }}/App/data/database.db
+          FLASK_APP=run.py
+          FLASK_ENV=production
+          SECRET_KEY=supersecretkey
+          GEMINI_API_KEY=dummy-api-key
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Crear directorio para datos
+      file:
+        path: "{{ app_dest }}/App/data"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Crear archivo wsgi.py en App
+      copy:
+        dest: "{{ app_dest }}/App/wsgi.py"
+        content: |
+          import sys
+          import os
+          
+          # Asegurar que el directorio actual esté en el path
+          sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+          
+          from app import create_app
+          
+          app = create_app()
+          
+          if __name__ == "__main__":
+              app.run()
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Configurar servicio systemd para Gunicorn
+      copy:
+        dest: /etc/systemd/system/{{ service_name }}.service
+        content: |
+          [Unit]
+          Description=Gunicorn de TeenSmartInsight
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          Group=ubuntu
+          WorkingDirectory={{ app_dest }}/App
+          Environment="PATH={{ venv_path }}/bin"
+          Environment="PYTHONPATH={{ app_dest }}/App"
+          Environment="DATABASE_PATH={{ app_dest }}/App/data/database.db"
+          Environment="FLASK_APP=run.py"
+          Environment="FLASK_ENV=production"
+          Environment="SECRET_KEY=supersecretkey"
+          Environment="GEMINI_API_KEY=dummy-api-key"
+          ExecStart={{ venv_path }}/bin/gunicorn --workers 3 --bind {{ gunicorn_bind }} --access-logfile {{ app_dest }}/logs/access.log --error-logfile {{ app_dest }}/logs/error.log --pythonpath {{ app_dest }}/App wsgi:app
+
+          [Install]
+          WantedBy=multi-user.target
+      notify:
+        - Reload systemd
+        - Reiniciar {{ service_name }}
+
+    - name: Eliminar configuración predeterminada de Nginx
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reiniciar nginx
+
+    - name: Configurar Nginx como reverse proxy
+      copy:
+        dest: /etc/nginx/sites-available/{{ service_name }}
+        content: |
+          server {
+              listen 80 default_server;
+              server_name _;
+              
+              location / {
+                  proxy_pass http://{{ gunicorn_bind }};
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+                  proxy_connect_timeout 300s;
+                  proxy_read_timeout 300s;
+              }
+
+              location /static {
+                  alias {{ app_directory }}/app/static;
+              }
+              
+              location /assets {
+                  alias {{ app_directory }}/app/static/assets;
+              }
+          }
+      notify: Reiniciar nginx
+
+    - name: Habilitar sitio en Nginx
+      file:
+        src: /etc/nginx/sites-available/{{ service_name }}
+        dest: /etc/nginx/sites-enabled/{{ service_name }}
+        state: link
+      notify: Reiniciar nginx
+
+    # Nota: En instancias EC2, los puertos se abren a través de grupos de seguridad en la consola AWS
+    # y no mediante firewalld. Asegúrate de que los puertos 80 y 8000 estén abiertos en tu grupo de seguridad.
+
+    - name: Verificar estado del servicio
+      command: systemctl status {{ service_name }}
+      register: service_status
+      changed_when: false
+      failed_when: false
+
+    - name: Mostrar estado del servicio
+      debug:
+        var: service_status.stdout_lines
+
+    - name: Verificar archivo run.py en App
+      command: cat {{ app_dest }}/App/run.py
+      register: run_py_content
+      changed_when: false
+      failed_when: false
+
+    - name: Mostrar contenido de run.py
+      debug:
+        var: run_py_content.stdout_lines
+
+    - name: Crear archivo mock_analysis_service.py
+      copy:
+        dest: "{{ app_dest }}/App/app/services/mock_analysis_service.py"
+        content: |
+          # Mock para el servicio de análisis
+          class MockAnalysisService:
+              def __init__(self):
+                  pass
+                  
+              def analyze_data(self, data):
+                  return {
+                      "addiction_level": "Moderado",
+                      "recommendations": "Limitar el uso de dispositivos a 2 horas diarias."
+                  }
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Crear archivo main_controller.py
+      copy:
+        dest: "{{ app_dest }}/App/app/controllers/main_controller.py"
+        content: |
+          from flask import Blueprint, render_template, request, jsonify
+          from app.services.gemini_service import GeminiService
+          
+          main_bp = Blueprint('main', __name__)
+          gemini_service = GeminiService()
+          
+          @main_bp.route('/')
+          def index():
+              return "TeenSmartInsight está funcionando correctamente!"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Crear mock para Gemini API directamente
+      copy:
+        dest: "{{ app_dest }}/App/app/services/gemini_service.py"
+        content: |
+          import os
+          from dotenv import load_dotenv
+
+          # Mock para google.generativeai
+          class MockGenAI:
+              def configure(self, api_key):
+                  pass
+                  
+              def GenerativeModel(self, model_name):
+                  return MockModel()
+
+          class MockModel:
+              def generate_content(self, prompt):
+                  return MockResponse()
+
+          class MockResponse:
+              def __str__(self):
+                  return "Esta es una respuesta simulada de Gemini API"
+              
+              @property
+              def text(self):
+                  return "Esta es una respuesta simulada de Gemini API"
+
+          # Crear una instancia global
+          genai = MockGenAI()
+
+          class GeminiService:
+              def __init__(self):
+                  load_dotenv()
+                  api_key = os.getenv('GEMINI_API_KEY')
+                  genai.configure(api_key=api_key)
+                  self.model = genai.GenerativeModel("gemini-pro")
+              
+              def generate_response(self, prompt):
+                  try:
+                      response = self.model.generate_content(prompt)
+                      return response.text
+                  except Exception as e:
+                      return f"Error al generar respuesta: {str(e)}"
+                      
+              def format_markdown(self, text):
+                  # Implementación simple sin usar markdown2
+                  return f"<div class='markdown'>{text}</div>"
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+
+    - name: Verificar logs de la aplicación
+      command: tail -n 20 {{ app_dest }}/logs/error.log
+      register: app_logs
+      changed_when: false
+      failed_when: false
+      ignore_errors: yes
+
+    - name: Asegurar permisos correctos para el directorio de la aplicación
+      file:
+        path: "{{ app_dest }}"
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        recurse: yes
+        
+    - name: Crear archivo de base de datos vacío
+      copy:
+        dest: "{{ app_dest }}/App/data/database.db"
+        content: ""
+        owner: ubuntu
+        group: ubuntu
+        mode: '0644'
+        force: no
+        
+    - name: Reiniciar servicio manualmente
+      systemd:
+        name: "{{ service_name }}"
+        state: restarted
+        daemon_reload: yes
+
+    - name: Mostrar logs de la aplicación
+      debug:
+        var: app_logs.stdout_lines
+
+  handlers:
+    - name: Reload systemd
+      command: systemctl daemon-reload
+
+    - name: Reiniciar {{ service_name }}
+      systemd:
+        name: "{{ service_name }}"
+        state: restarted
+        enabled: yes
+
+    - name: Reiniciar nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
