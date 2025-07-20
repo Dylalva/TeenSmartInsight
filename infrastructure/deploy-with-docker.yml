@@ -101,7 +101,7 @@
 
         - name: Crear configuración Nginx para HTTPS
           copy:
-            dest: /home/dylanalvarado/Documentos/Portafolio/TeenSmartInsight/infrastructure/nginx-https.conf
+            dest: /tmp/nginx-https.conf
             content: |
               server {
                   listen 80;
@@ -150,17 +150,17 @@
       block:
         - name: Obtener certificado SSL con Certbot
           command: >
-            certbot --nginx -d {{ domain }} --non-interactive --agree-tos --email admin@{{ domain }}
+            certbot --nginx -d {{ domain }} --non-interactive --agree-tos --email dylalva1933@gmail.com
             --redirect
           register: certbot_result
           failed_when: false
 
         - name: Aplicar configuración HTTPS si Certbot tuvo éxito
           copy:
-            src: /home/dylanalvarado/Documentos/Portafolio/TeenSmartInsight/infrastructure/nginx-https.conf
+            src: /tmp/nginx-https.conf
             dest: /etc/nginx/sites-available/{{ app_name }}
             mode: '0644'
-            remote_src: no
+            remote_src: yes
           when: certbot_result.rc == 0
           notify: Reiniciar nginx
 
