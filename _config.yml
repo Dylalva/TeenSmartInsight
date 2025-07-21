@@ -1,0 +1,36 @@
+title: PTeenSmartInsight
+description: >                      
+  Un sitio estático generado con Jekyll
+baseurl: "/TeenSmartInsight"
+url: "https://dylalva.github.io"
+
+source: docs
+
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+author:
+  name: Dylan Elizondo Alvarado
+  email: dylalva1933@gmail.com
+
+permalink: /:categories/:year/:month/:day/:title.html
+paginate_path: "/page:num/"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+include:
+  - _pages
+
+github:
+  is_project_page: true
