@@ -11,6 +11,12 @@ TeenSmartInsight is a comprehensive data science and web application project des
 - [Infrastructure Documentation](INFRASTRUCTURE.md) - Details about AWS deployment, Docker containerization, and CI/CD pipeline
 - [API Documentation](API.md) - Information about the Gemini API integration and other services
 
+## Project Diagrams
+
+- [Project Structure Diagram](PROJECT_STRUCTURE.md) - Visual representation of the project's directory structure
+- [Workflow Diagrams](WORKFLOW_DIAGRAM.md) - Diagrams showing the application workflow, model training, and deployment process
+- [Component Diagrams](COMPONENT_DIAGRAM.md) - Diagrams showing the system components and their relationships
+
 ## Key Features
 
 - **Data-Driven Analysis**: Comprehensive analysis of adolescent technology usage patterns
