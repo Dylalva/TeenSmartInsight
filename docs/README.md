@@ -34,7 +34,7 @@ To get started with TeenSmartInsight:
 3. Install dependencies with `pip install -r requirements.txt`
 4. Run the application locally with `python App/run.py`
 
-For more detailed instructions, see the [Application Documentation](APP.md).
+For more detailed instructions, see the [Application Documentation](APP.md). 
 
 ## Project Structure
 
