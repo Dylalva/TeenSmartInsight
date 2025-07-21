@@ -7,7 +7,7 @@ This directory contains the Terraform configuration to deploy the TeenSmartInsig
 
 ## Prerequisites
 
-1. Terraform installed (see https://www.terraform.io/downloads.html)  
+1. Terraform [installed](https://www.terraform.io/downloads.html)  
 2. An AWS account with credentials configured
 
 ## AWS Credentials Configuration
@@ -31,7 +31,6 @@ Set the following environment variables in your shell:
 ```bash
 export AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="YOUR_SECRET_KEY"
-export AWS_REGION="us-east-2"
 ```
 
 ### Option 3: Hardcode credentials in `main.tf` (not recommended)
@@ -141,7 +140,6 @@ Configura las siguientes variables de entorno:
 ```bash
 export AWS_ACCESS_KEY_ID="TU_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="TU_SECRET_KEY"
-export AWS_REGION="us-east-2"
 ```
 
 ### Opción 3: Credenciales en el archivo main.tf

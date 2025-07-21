@@ -21,6 +21,7 @@ TeenSmartInsight/
 ├── data/                   # Data directory
 │   └── raw/                # Raw dataset files
 ├── figures/                # Visualization outputs
+├── infrastructure/         # Deployment infrastructure in AWS
 ├── models/                 # Trained models
 ├── notebooks/              # Jupyter notebooks for analysis
 ├── scripts/                # Utility scripts
@@ -112,6 +113,7 @@ TeenSmartInsight/
 ├── data/                   # Directorio de datos
 │   └── raw/                # Archivos de datos sin procesar
 ├── figures/                # Salidas de visualización
+├── infrastructure/         # Infrastructura para despligue en AWS
 ├── models/                 # Modelos entrenados
 ├── notebooks/              # Notebooks Jupyter para análisis
 ├── scripts/                # Scripts de utilidad
