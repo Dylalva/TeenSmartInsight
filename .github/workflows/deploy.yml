@@ -33,16 +33,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible
 
-      - name: Configure SSH key
+      - name: Generate SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_flaskapp
+          # Generar una nueva clave SSH sin passphrase
+          ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_flaskapp -N ""
           chmod 600 ~/.ssh/id_rsa_flaskapp
-          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
-          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa_flaskapp.pub
-          chmod 644 ~/.ssh/id_rsa.pub
           chmod 644 ~/.ssh/id_rsa_flaskapp.pub
-          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+          
+          # Mostrar la clave pública generada
+          echo "Nueva clave SSH pública generada:"
+          cat ~/.ssh/id_rsa_flaskapp.pub
+          
+          # Configurar SSH
+          cat > ~/.ssh/config << 'EOL'
+          Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ServerAliveInterval 60
+            ServerAliveCountMax 10
+            ConnectTimeout 180
+            ConnectionAttempts 10
+          EOL
+          chmod 600 ~/.ssh/config
+          
+          # Copiar la clave pública al directorio de infraestructura
+          mkdir -p infrastructure
+          cp ~/.ssh/id_rsa_flaskapp.pub infrastructure/
 
       - name: Terraform Init
         run: |
@@ -116,28 +133,16 @@ jobs:
             fi
           fi
           
-          # Verify security group allows SSH
-          echo "Checking security group configuration..."
-          terraform state show aws_security_group.web_sg
-          
-          # Wait longer for instance to initialize
           echo "Waiting for SSH on $IP..."
           # Esperar a que la instancia esté lista para conexiones SSH
-          for i in {1..60}; do
-            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -v ubuntu@$IP 'echo SSH ready'; then
+          for i in {1..30}; do
+            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@$IP 'echo SSH ready'; then
               echo "SSH está listo!"
               break
             fi
-            if [ $i -eq 60 ]; then
-              echo "SSH connection failed after 60 attempts. Continuing anyway..."
-            else
-              echo "Intento $i: SSH aún no está listo, esperando..."
-              sleep 10
-            fi
+            echo "Intento $i: SSH aún no está listo, esperando..."
+            sleep 10
           done
-          
-          # Add the host key to known_hosts
-          ssh-keyscan -H $IP >> ~/.ssh/known_hosts || true
 
       - name: Run Ansible Playbook
         id: ansible
@@ -206,6 +211,17 @@ jobs:
           cd infrastructure
           terraform init
           
+      - name: Generate SSH key for cleanup
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_flaskapp -N ""
+          chmod 600 ~/.ssh/id_rsa_flaskapp
+          chmod 644 ~/.ssh/id_rsa_flaskapp.pub
+          
+          # Copiar la clave pública al directorio de infraestructura
+          mkdir -p infrastructure
+          cp ~/.ssh/id_rsa_flaskapp.pub infrastructure/
+      
       - name: Terraform Destroy
         run: |
           cd infrastructure
