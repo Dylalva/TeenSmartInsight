@@ -64,10 +64,17 @@ jobs:
         id: terraform_output
         run: |
           cd infrastructure
-          IP=$(terraform output -raw public_ip)
-          echo "instance_ip=$IP" >> $GITHUB_OUTPUT
-          echo "IP capturada: $IP"
-          echo "instance_ip=$IP" >> $GITHUB_ENV
+          # Store the output in a variable without debug messages
+          IP=$(terraform output -raw public_ip 2>/dev/null | tr -d '\n')
+          # Verify the IP is valid
+          if [[ $IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "instance_ip=$IP" >> $GITHUB_OUTPUT
+            echo "instance_ip=$IP" >> $GITHUB_ENV
+            echo "IP capturada: $IP"
+          else
+            echo "Error: Invalid IP format or Terraform output failed"
+            exit 1
+          fi
 
       - name: Update hosts.ini with new IP
         run: |
