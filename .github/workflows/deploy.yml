@@ -91,8 +91,13 @@ jobs:
           fi
           
           echo "Using IP: $IP"
-          echo "[app_servers]" > hosts.ini
-          echo "$IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
+          echo "[web]" > hosts.ini
+          echo "$IP" >> hosts.ini
+          echo "" >> hosts.ini
+          echo "[web:vars]" >> hosts.ini
+          echo "ansible_user=ubuntu" >> hosts.ini
+          echo "ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp" >> hosts.ini
+          echo "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
 
       - name: Wait for SSH to be available
         run: |
@@ -103,7 +108,7 @@ jobs:
             echo "Read IP from file: $IP"
           else
             # Fallback to extracting from hosts.ini
-            IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' hosts.ini)
+            IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' hosts.ini | head -1)
             if [ -z "$IP" ]; then
               echo "Error: Could not extract IP from hosts.ini"
               cat hosts.ini
@@ -111,16 +116,28 @@ jobs:
             fi
           fi
           
+          # Verify security group allows SSH
+          echo "Checking security group configuration..."
+          terraform state show aws_security_group.web_sg
+          
+          # Wait longer for instance to initialize
           echo "Waiting for SSH on $IP..."
           # Esperar a que la instancia esté lista para conexiones SSH
-          for i in {1..30}; do
-            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@$IP 'echo SSH ready'; then
+          for i in {1..60}; do
+            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -v ubuntu@$IP 'echo SSH ready'; then
               echo "SSH está listo!"
               break
             fi
-            echo "Intento $i: SSH aún no está listo, esperando..."
-            sleep 10
+            if [ $i -eq 60 ]; then
+              echo "SSH connection failed after 60 attempts. Continuing anyway..."
+            else
+              echo "Intento $i: SSH aún no está listo, esperando..."
+              sleep 10
+            fi
           done
+          
+          # Add the host key to known_hosts
+          ssh-keyscan -H $IP >> ~/.ssh/known_hosts || true
 
       - name: Run Ansible Playbook
         id: ansible
@@ -132,8 +149,24 @@ jobs:
           cat hosts.ini
           echo "\nVerificando permisos de la clave SSH:"
           ls -la ~/.ssh/id_rsa_flaskapp
-          # Ejecutar Ansible con modo verbose
-          ansible-playbook -i hosts.ini deploy-with-docker.yml -vv
+          
+          # Verificar que el archivo de playbook existe
+          if [ -f "deploy-with-docker.yml" ]; then
+            echo "Playbook found: deploy-with-docker.yml"
+            ls -la deploy-with-docker.yml
+          else
+            echo "ERROR: deploy-with-docker.yml not found!"
+            ls -la
+            exit 1
+          fi
+          
+          # Test SSH connection directly
+          IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' hosts.ini | head -1)
+          echo "\nTesting direct SSH connection to $IP:"
+          ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=10 -v ubuntu@$IP 'echo Direct SSH test' || echo "Direct SSH test failed but continuing"
+          
+          # Ejecutar Ansible con modo verbose y timeout aumentado
+          ANSIBLE_TIMEOUT=60 ANSIBLE_SSH_RETRIES=10 ansible-playbook -i hosts.ini deploy-with-docker.yml -vvv
           
       - name: Set deployment status
         id: set_deployment_status
