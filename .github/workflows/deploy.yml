@@ -64,30 +64,67 @@ jobs:
         id: terraform_output
         run: |
           cd infrastructure
-          # Store the output in a variable without debug messages
-          IP=$(terraform output -raw public_ip 2>/dev/null | tr -d '\n')
-          # Verify the IP is valid
-          if [[ $IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "instance_ip=$IP" >> $GITHUB_OUTPUT
-            echo "instance_ip=$IP" >> $GITHUB_ENV
-            echo "IP capturada: $IP"
+          # Debug: Show all outputs
+          echo "All Terraform outputs:"
+          terraform output
+          
+          # Save output to file first
+          terraform output -json > tf_output.json
+          
+          # Extract IP using jq if available
+          if command -v jq &> /dev/null; then
+            IP=$(jq -r '.public_ip.value' tf_output.json)
           else
-            echo "Error: Invalid IP format or Terraform output failed"
-            exit 1
+            # Fallback to grep
+            IP=$(grep -o '"public_ip": "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+"' tf_output.json | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+')
           fi
+          
+          echo "Extracted IP: $IP"
+          
+          # Set outputs regardless of format
+          echo "instance_ip=$IP" >> $GITHUB_OUTPUT
+          echo "instance_ip=$IP" >> $GITHUB_ENV
 
       - name: Update hosts.ini with new IP
         run: |
           cd infrastructure
+          # Get IP from file as fallback
+          if [ -z "${{ steps.terraform_output.outputs.instance_ip }}" ] && [ -z "${{ env.instance_ip }}" ]; then
+            if [ -f tf_output.json ]; then
+              echo "Using IP from tf_output.json file"
+              if command -v jq &> /dev/null; then
+                IP=$(jq -r '.public_ip.value' tf_output.json)
+              else
+                IP=$(grep -o '"public_ip": "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+"' tf_output.json | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+')
+              fi
+            else
+              echo "Error: Could not determine instance IP"
+              exit 1
+            fi
+          else
+            IP="${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }}"
+          fi
+          
+          echo "Using IP: $IP"
           echo "[app_servers]" > hosts.ini
-          echo "${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
+          echo "$IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
 
       - name: Wait for SSH to be available
         run: |
+          cd infrastructure
+          # Get IP from hosts.ini
+          IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' hosts.ini)
+          
+          if [ -z "$IP" ]; then
+            echo "Error: Could not extract IP from hosts.ini"
+            cat hosts.ini
+            exit 1
+          fi
+          
+          echo "Waiting for SSH on $IP..."
           # Esperar a que la instancia esté lista para conexiones SSH
-          echo "Esperando a que la instancia esté lista para SSH..."
           for i in {1..30}; do
-            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }} 'echo SSH ready'; then
+            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@$IP 'echo SSH ready'; then
               echo "SSH está listo!"
               break
             fi
