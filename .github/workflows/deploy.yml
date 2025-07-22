@@ -64,23 +64,30 @@ jobs:
         id: terraform_output
         run: |
           cd infrastructure
-          # Extract IP directly from terraform output
-          IP=$(terraform output public_ip | tr -d '"')
+          # Write terraform output to a file
+          terraform output > terraform_output.txt
+          cat terraform_output.txt
+          
+          # Extract IP using grep
+          IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' terraform_output.txt | head -1)
           echo "Extracted IP: $IP"
           
-          # Set outputs
-          echo "instance_ip=$IP" >> $GITHUB_OUTPUT
-          echo "instance_ip=$IP" >> $GITHUB_ENV
+          # Save IP to a file for later steps
+          echo "$IP" > instance_ip.txt
+          
+          # Set output manually
+          echo "instance_ip=$IP" >> "$GITHUB_OUTPUT"
 
       - name: Update hosts.ini with new IP
         run: |
           cd infrastructure
-          # Get IP directly from terraform if needed
-          if [ -z "${{ steps.terraform_output.outputs.instance_ip }}" ] && [ -z "${{ env.instance_ip }}" ]; then
-            IP=$(terraform output public_ip | tr -d '"')
-            echo "Got IP directly from terraform: $IP"
+          # Read IP from file
+          if [ -f instance_ip.txt ]; then
+            IP=$(cat instance_ip.txt)
+            echo "Read IP from file: $IP"
           else
-            IP="${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }}"
+            echo "Error: instance_ip.txt not found"
+            exit 1
           fi
           
           echo "Using IP: $IP"
@@ -90,13 +97,18 @@ jobs:
       - name: Wait for SSH to be available
         run: |
           cd infrastructure
-          # Get IP from hosts.ini
-          IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' hosts.ini)
-          
-          if [ -z "$IP" ]; then
-            echo "Error: Could not extract IP from hosts.ini"
-            cat hosts.ini
-            exit 1
+          # Read IP from file
+          if [ -f instance_ip.txt ]; then
+            IP=$(cat instance_ip.txt)
+            echo "Read IP from file: $IP"
+          else
+            # Fallback to extracting from hosts.ini
+            IP=$(grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+' hosts.ini)
+            if [ -z "$IP" ]; then
+              echo "Error: Could not extract IP from hosts.ini"
+              cat hosts.ini
+              exit 1
+            fi
           fi
           
           echo "Waiting for SSH on $IP..."
