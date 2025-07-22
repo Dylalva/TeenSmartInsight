@@ -12,6 +12,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: "us-east-2"
+    outputs:
+      deployment_success: ${{ steps.set_deployment_status.outputs.success }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -63,21 +65,22 @@ jobs:
         run: |
           cd infrastructure
           IP=$(terraform output -raw public_ip)
-          echo "instance_ip=$IP" >> $GITHUB_ENV
+          echo "instance_ip=$IP" >> $GITHUB_OUTPUT
           echo "IP capturada: $IP"
+          echo "instance_ip=$IP" >> $GITHUB_ENV
 
       - name: Update hosts.ini with new IP
         run: |
           cd infrastructure
           echo "[app_servers]" > hosts.ini
-          echo "${{ env.instance_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
+          echo "${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_flaskapp ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> hosts.ini
 
       - name: Wait for SSH to be available
         run: |
           # Esperar a que la instancia esté lista para conexiones SSH
           echo "Esperando a que la instancia esté lista para SSH..."
           for i in {1..30}; do
-            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@${{ env.instance_ip }} 'echo SSH ready'; then
+            if ssh -i ~/.ssh/id_rsa_flaskapp -o StrictHostKeyChecking=no -o ConnectTimeout=5 ubuntu@${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }} 'echo SSH ready'; then
               echo "SSH está listo!"
               break
             fi
@@ -86,6 +89,8 @@ jobs:
           done
 
       - name: Run Ansible Playbook
+        id: ansible
+        continue-on-error: true
         run: |
           cd infrastructure
           # Mostrar información de depuración
@@ -94,4 +99,47 @@ jobs:
           echo "\nVerificando permisos de la clave SSH:"
           ls -la ~/.ssh/id_rsa_flaskapp
           # Ejecutar Ansible con modo verbose
-          ansible-playbook -i hosts.ini deploy.yml -vv
+          ansible-playbook -i hosts.ini deploy-with-docker.yml -vv
+          
+      - name: Set deployment status
+        id: set_deployment_status
+        run: |
+          if [ "${{ steps.ansible.outcome }}" == "success" ]; then
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "success=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Terraform Destroy on Failure
+        if: steps.set_deployment_status.outputs.success != 'true'
+        run: |
+          echo "Deployment failed, destroying infrastructure..."
+          cd infrastructure
+          terraform destroy -auto-approve
+
+  cleanup:
+    needs: deploy
+    if: failure() || needs.deploy.outputs.deployment_success != 'true'
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: "us-east-2"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.0.0
+          
+      - name: Terraform Init
+        run: |
+          cd infrastructure
+          terraform init
+          
+      - name: Terraform Destroy
+        run: |
+          cd infrastructure
+          terraform destroy -auto-approve
