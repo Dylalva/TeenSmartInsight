@@ -64,43 +64,21 @@ jobs:
         id: terraform_output
         run: |
           cd infrastructure
-          # Debug: Show all outputs
-          echo "All Terraform outputs:"
-          terraform output
-          
-          # Save output to file first
-          terraform output -json > tf_output.json
-          
-          # Extract IP using jq if available
-          if command -v jq &> /dev/null; then
-            IP=$(jq -r '.public_ip.value' tf_output.json)
-          else
-            # Fallback to grep
-            IP=$(grep -o '"public_ip": "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+"' tf_output.json | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+')
-          fi
-          
+          # Extract IP directly from terraform output
+          IP=$(terraform output public_ip | tr -d '"')
           echo "Extracted IP: $IP"
           
-          # Set outputs regardless of format
+          # Set outputs
           echo "instance_ip=$IP" >> $GITHUB_OUTPUT
           echo "instance_ip=$IP" >> $GITHUB_ENV
 
       - name: Update hosts.ini with new IP
         run: |
           cd infrastructure
-          # Get IP from file as fallback
+          # Get IP directly from terraform if needed
           if [ -z "${{ steps.terraform_output.outputs.instance_ip }}" ] && [ -z "${{ env.instance_ip }}" ]; then
-            if [ -f tf_output.json ]; then
-              echo "Using IP from tf_output.json file"
-              if command -v jq &> /dev/null; then
-                IP=$(jq -r '.public_ip.value' tf_output.json)
-              else
-                IP=$(grep -o '"public_ip": "[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+"' tf_output.json | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+')
-              fi
-            else
-              echo "Error: Could not determine instance IP"
-              exit 1
-            fi
+            IP=$(terraform output public_ip | tr -d '"')
+            echo "Got IP directly from terraform: $IP"
           else
             IP="${{ steps.terraform_output.outputs.instance_ip || env.instance_ip }}"
           fi
