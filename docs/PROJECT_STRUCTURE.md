@@ -17,8 +17,6 @@ graph TD
     A --> H[scripts]
     A --> I[src]
     A --> J[docs]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ## Web Application Structure
@@ -34,8 +32,6 @@ graph TD
     B --> B5[docker-compose.yml]
     B --> B6[run.py]
     B --> B7[requirements.txt]
-    
-    style B fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ## Application Core Structure
@@ -55,8 +51,6 @@ graph TD
     B1B --> B1B1[prediction_model.py]
     B1C --> B1C1[gemini_service.py]
     B1C --> B1C2[mock_analysis_service.py]
-    
-    style B1 fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ## Templates and Static Files
@@ -78,10 +72,6 @@ graph TD
     
     B1F[utils] --> B1F1[forms.py]
     B1F --> B1F2[filters.py]
-    
-    style B1D fill:#dfd,stroke:#333,stroke-width:2px
-    style B1E fill:#dfd,stroke:#333,stroke-width:2px
-    style B1F fill:#dfd,stroke:#333,stroke-width:2px
 ```
 
 ## Data and Model Structure
@@ -94,9 +84,6 @@ graph TD
     C1 --> C1A[teen_phone_addiction_dataset.csv]
     
     F[models] --> F1[rf_pipeline.pkl]
-    
-    style C fill:#fdd,stroke:#333,stroke-width:2px
-    style F fill:#fdd,stroke:#333,stroke-width:2px
 ```
 
 ## Source Code Structure
@@ -109,8 +96,6 @@ graph TD
     I1 --> I1A[models]
     I1A --> I1A1[train_model.py]
     I1A --> I1A2[evaluate_model.py]
-    
-    style I fill:#ddf,stroke:#333,stroke-width:2px
 ```
 
 ## Infrastructure and Documentation
@@ -128,12 +113,9 @@ graph TD
     J --> J3[APP.md]
     J --> J4[INFRASTRUCTURE.md]
     J --> J5[API.md]
-    J --> J6[project_structure.md]
-    J --> J7[workflow_diagram.md]
-    J --> J8[component_diagram.md]
-    
-    style E fill:#ffd,stroke:#333,stroke-width:2px
-    style J fill:#ffd,stroke:#333,stroke-width:2px
+    J --> J6[PROJECT_STRUCTURE.md]
+    J --> J7[WORKFLOW_DIAGRAM.md]
+    J --> J8[COMPONENT_DIAGRAM.md]
 ```
 
 ## Key Components Description

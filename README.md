@@ -184,3 +184,5 @@ Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
 </details>
 
 [Demo](figures/app_demo.mp4)
+
+[Wiki](https://github.com/Dylalva/TeenSmartInsight/wiki)

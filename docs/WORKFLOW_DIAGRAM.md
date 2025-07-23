@@ -19,10 +19,6 @@ flowchart TD
     I --> J
     J --> K[Display results to user]
     K --> L[Save prediction to CSV]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style F fill:#bbf,stroke:#333,stroke-width:2px
-    style J fill:#dfd,stroke:#333,stroke-width:2px
 ```
 
 ## Model Training Workflow
@@ -41,10 +37,6 @@ flowchart TD
     H --> E
     G -->|Yes| I[Model serialization]
     I --> J[Model saved as rf_pipeline.pkl]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style E fill:#bbf,stroke:#333,stroke-width:2px
-    style J fill:#dfd,stroke:#333,stroke-width:2px
 ```
 
 ## Deployment Workflow
@@ -63,9 +55,6 @@ flowchart TD
     H --> I[Configure Nginx]
     I --> J[Obtain SSL certificates]
     J --> K[Application in production]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style K fill:#dfd,stroke:#333,stroke-width:2px
 ```
 
 ## System Architecture
@@ -80,14 +69,10 @@ flowchart TD
     C -->|API| E[Google Gemini API]
     D --> F[Data Storage]
     
-    subgraph AWS EC2
+    subgraph AWSEC2[AWS EC2]
         B
         C
         D
         F
     end
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style E fill:#dfd,stroke:#333,stroke-width:2px
 ```

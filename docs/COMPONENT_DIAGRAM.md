@@ -6,6 +6,15 @@ This diagram shows the main components of the TeenSmartInsight system and how th
 
 ```mermaid
 classDiagram
+    WebApplication --> Controllers : uses
+    Controllers --> Forms : validates
+    Controllers --> PredictionModel : gets prediction
+    Controllers --> GeminiService : gets analysis
+    Controllers --> MockAnalysisService : fallback
+    PredictionModel --> RandomForestModel : uses
+    PredictionModel --> DataStorage : stores results
+    GeminiService --> GeminiAPI : calls
+    
     class WebApplication {
         +Flask app
         +Templates
@@ -59,18 +68,10 @@ classDiagram
         +write_data()
     }
     
-    WebApplication --> Controllers : uses
-    Controllers --> Forms : validates
-    Controllers --> PredictionModel : gets prediction
-    Controllers --> GeminiService : gets analysis
-    Controllers --> MockAnalysisService : fallback
-    PredictionModel --> RandomForestModel : uses
-    PredictionModel --> DataStorage : stores results
-    GeminiService --> "Google Gemini API" : calls
-    
-    style WebApplication fill:#f9f,stroke:#333,stroke-width:2px
-    style PredictionModel fill:#bbf,stroke:#333,stroke-width:2px
-    style GeminiService fill:#dfd,stroke:#333,stroke-width:2px
+    class GeminiAPI {
+        +Google Gemini API
+    }
+```
 ```
 
 ## Layered Architecture Diagram
@@ -85,29 +86,29 @@ graph TD
     C --> E[External APIs]
     D --> F[Data Layer]
     
-    subgraph "Presentation Layer"
+    subgraph PresentationLayer["Presentation Layer"]
         A1[HTML Templates]
         A2[CSS/JavaScript]
     end
     
-    subgraph "Controller Layer"
+    subgraph ControllerLayer["Controller Layer"]
         B1[main_controller.py]
     end
     
-    subgraph "Service Layer"
+    subgraph ServiceLayer["Service Layer"]
         C1[gemini_service.py]
         C2[mock_analysis_service.py]
     end
     
-    subgraph "Model Layer"
+    subgraph ModelLayer["Model Layer"]
         D1[prediction_model.py]
     end
     
-    subgraph "External APIs"
+    subgraph ExternalAPIs["External APIs"]
         E1[Google Gemini API]
     end
     
-    subgraph "Data Layer"
+    subgraph DataLayer["Data Layer"]
         F1[CSV Storage]
         F2[Machine Learning Model]
     end
@@ -121,10 +122,7 @@ graph TD
     E --> E1
     F --> F1
     F --> F2
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style F fill:#dfd,stroke:#333,stroke-width:2px
+```
 ```
 
 ## Prediction Sequence Diagram
@@ -154,8 +152,4 @@ sequenceDiagram
     AI-->>Controller: Returns recommendations
     Controller->>WebUI: Displays results
     WebUI-->>User: Views prediction and recommendations
-    
-    style User fill:#f9f,stroke:#333,stroke-width:2px
-    style ML fill:#bbf,stroke:#333,stroke-width:2px
-    style AI fill:#dfd,stroke:#333,stroke-width:2px
 ```
