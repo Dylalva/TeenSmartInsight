@@ -1,5 +1,8 @@
 # TeenSmartInsight
 
+<details>
+<summary><h2>Architecture /  Arquitectura</h2></summary>
+
 ```mermaid
 flowchart TD
     A[Client/Browser] -->|HTTPS| B[Nginx]
@@ -15,6 +18,8 @@ flowchart TD
         F
     end
 ```
+
+</details>
 
 <details>
 <summary><h2>English</h2></summary>
