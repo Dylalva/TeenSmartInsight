@@ -1,5 +1,21 @@
 # TeenSmartInsight
 
+```mermaid
+flowchart TD
+    A[Client/Browser] -->|HTTPS| B[Nginx]
+    B -->|Reverse proxy| C[Docker Container]
+    C -->|Flask App| D[Prediction Model]
+    C -->|API| E[Google Gemini API]
+    D --> F[Data Storage]
+    
+    subgraph AWSEC2[AWS EC2]
+        B
+        C
+        D
+        F
+    end
+```
+
 <details>
 <summary><h2>English</h2></summary>
 
