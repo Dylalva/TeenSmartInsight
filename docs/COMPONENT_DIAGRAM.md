@@ -72,7 +72,7 @@ classDiagram
         +Google Gemini API
     }
 ```
-```
+
 
 ## Layered Architecture Diagram
 
@@ -122,7 +122,6 @@ graph TD
     E --> E1
     F --> F1
     F --> F2
-```
 ```
 
 ## Prediction Sequence Diagram
